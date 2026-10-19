@@ -1,0 +1,74 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper function to check authentication and user ownership
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    // Allowed transaction categories as defined in PRD Section 4
+    function isValidCategory(cat) {
+      return cat in [
+        'makan_minum',
+        'kopi_jajan',
+        'transportasi',
+        'kos_tagihan',
+        'pulsa_internet',
+        'kuliah',
+        'belanja',
+        'hiburan',
+        'kesehatan',
+        'lainnya',
+        'uang_saku',
+        'kerja',
+        'pemasukan_lainnya'
+      ];
+    }
+
+    // Transaction validation logic
+    function isValidTransaction(data) {
+      return (data.type == 'expense' || data.type == 'income') &&
+             data.amount is int &&
+             data.amount >= 1 &&
+             data.amount <= 50000000 &&
+             isValidCategory(data.category);
+    }
+
+    match /users/{userId} {
+      // User can read and write their own profile
+      allow read, write: if isOwner(userId);
+
+      // Transactions subcollection
+      match /transactions/{transactionId} {
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidTransaction(request.resource.data);
+        allow delete: if isOwner(userId);
+      }
+
+      // Budgets subcollection
+      match /budgets/{budgetId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Category rules subcollection
+      match /categoryRules/{ruleId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Alerts subcollection
+      match /alerts/{alertId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // AI logs subcollection
+      match /aiLogs/{logId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: false;
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "Moneta - Catat Keuangan Cukup dengan Foto Nota atau Chat AI",
+  "short_name": "Moneta",
+  "description": "Foto sekali, keuangan terkendali. Pencatat keuangan pintar untuk mahasiswa di Indonesia.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F8FAFC",
+  "theme_color": "#0F766E",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
